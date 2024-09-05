@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+     <!-- PyScript CSS and JavaScript -->
+     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
+     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+
+    <!-- <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
+    <script defer src="https://pyscript.net/releases/2024.8.2/core.js"></script> -->
+    
+    
+    <!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css">
+    <script defer  src="https://pyscript.net/alpha/pyscript.js"></script> -->
+
+    <title>PyScript Demo with Code Editor</title>
+    <!-- <title>pyscript demo 6 </title> -->
+</head>
+<body>
+
+     <!-- PyScript Environment -->
+     <py-env>
+        - numpy
+        - pandas
+    </py-env>
+
+     <!-- HTML element to display Python output -->
+     <div id="output-area"></div>
+
+     <!-- Text Area for Python Code -->
+     <textarea id="python-code" rows="10" cols="50">
+        # Write your Python code here
+        import math
+        print(math.sqrt(25))
+    </textarea>
+   
+    <!-- Button to Run Python Code -->
+    <button id="run-button">Run Code</button>
+
+    <!-- PyScript to run code from textarea -->
+    <py-script>
+        from js import document
+        from pyodide import runPythonAsync, create_proxy
+        import sys
+        from io import StringIO
+
+
+        async def run_code(event):
+            # Clear previous output
+            output_area = document.getElementById("output-area")
+            output_area.innerHTML = ""
+
+            # Capture the output of print statements
+            old_stdout = sys.stdout
+            sys.stdout = mystdout = StringIO()
+
+            # Get the Python code from the textarea
+            code = document.getElementById("python-code").value
+            
+            try:
+                # Execute the Python code asynchronously 
+                await runPythonAsync(code)
+                
+                # Get the output from the StringIO object
+                output = mystdout.getvalue()
+                output_area.innerHTML = f"<pre>{output}</pre>"
+                
+            except Exception as e:
+                # Handle any errors and display them in the output area
+                output_area.innerHTML = f"<pre>{e}</pre>"
+
+            finally:
+                # Reset stdout to its original value
+                sys.stdout = old_stdout
+
+        # Attach the run_code function to the button's click event
+        run_code_proxy = create_proxy(run_code)
+        document.getElementById("run-button").addEventListener("click", run_code_proxy)
+    </py-script>
+   
+    <!-- <h3>Interactive REPL</h3>
+    <py-repl id="repl-demo" auto-generate="true"></py-repl> -->
+
+</body>
+</html>
+
